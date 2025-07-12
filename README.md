@@ -1,1 +1,77 @@
 # Food-recipe-app
+
+package com.example.foodrecipeapp;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.*;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText ingredientInput;
+    Button searchButton;
+    ListView recipeListView;
+    ArrayList<String> recipeTitles;
+    ArrayAdapter<String> adapter;
+
+    // Sample recipes
+    String[][] recipes = {
+            {"Banana Shake", "banana, milk, sugar", "1. Peel bananas\n2. Blend with milk & sugar\n3. Serve cold"},
+            {"Chana Salad", "chana, onion, tomato, lemon", "1. Boil chana\n2. Mix with veggies\n3. Add lemon & salt"},
+            {"Aloo Paratha", "potato, flour, spices", "1. Make dough\n2. Stuff mashed potato\n3. Roll & fry"},
+            {"Fruit Salad", "apple, banana, grapes, honey", "1. Cut fruits\n2. Add honey\n3. Mix well"}
+    };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // Layout built in code for simplicity
+        LinearLayout layout = new LinearLayout(this);
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(16, 16, 16, 16);
+
+        ingredientInput = new EditText(this);
+        ingredientInput.setHint("Enter ingredient (e.g., banana)");
+        layout.addView(ingredientInput);
+
+        searchButton = new Button(this);
+        searchButton.setText("Search Recipes");
+        layout.addView(searchButton);
+
+        recipeListView = new ListView(this);
+        layout.addView(recipeListView, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 0, 1));
+
+        setContentView(layout);
+
+        recipeTitles = new ArrayList<>();
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, recipeTitles);
+        recipeListView.setAdapter(adapter);
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String input = ingredientInput.getText().toString().toLowerCase().trim();
+                recipeTitles.clear();
+                if (input.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Please enter an ingredient", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                for (String[] recipe : recipes) {
+                    if (recipe[1].toLowerCase().contains(input)) {
+                        recipeTitles.add(recipe[0] + "\nIngredients: " + recipe[1] + "\nSteps:\n" + recipe[2]);
+                    }
+                }
+
+                if (recipeTitles.isEmpty()) {
+                    recipeTitles.add("No recipes found with \"" + input + "\"");
+                }
+
+                adapter.notifyDataSetChanged();
+            }
+        });
+    }
+}
